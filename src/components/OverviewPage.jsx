@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss, onClear, flashType }) {
   const [progressReady, setProgressReady] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => setProgressReady(true), 150);
@@ -14,6 +15,79 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
     flashType === type
       ? "-translate-y-1.5 scale-[1.03] shadow-[0_0_20px_rgba(99,102,241,0.4)] ring-2 ring-[var(--primary)]"
       : "";
+
+  const engagementData = [3.0, 3.2, 3.35, 3.5, 3.6, 3.75, 3.9, 4.0, 4.05, 4.08, 4.12, 4.2];
+  const revenueData = [1.4, 1.55, 1.6, 1.72, 1.82, 1.95, 2.05, 2.15, 2.22, 2.28, 2.35, 2.42];
+  const chartLabels = [
+    "Mar 1",
+    "Mar 4",
+    "Mar 7",
+    "Mar 10",
+    "Mar 13",
+    "Mar 16",
+    "Mar 19",
+    "Mar 22",
+    "Mar 25",
+    "Mar 27",
+    "Mar 29",
+    "Mar 31"
+  ];
+  const chartWidth = 580;
+  const chartHeight = 150;
+  const paddingY = 12;
+  const maxValue = Math.max(...engagementData, ...revenueData);
+  const minValue = Math.min(...engagementData, ...revenueData);
+  const range = maxValue - minValue || 1;
+
+  const buildPoints = (data) =>
+    data.map((value, index) => {
+      const x = (chartWidth / (data.length - 1)) * index;
+      const y = chartHeight - ((value - minValue) / range) * (chartHeight - paddingY * 2) - paddingY;
+      return [x, y];
+    });
+
+  const buildPath = (points) =>
+    points.map(([x, y], index) => `${index === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+
+  const engagementPoints = buildPoints(engagementData);
+  const revenuePoints = buildPoints(revenueData);
+  const engagementLine = buildPath(engagementPoints);
+  const revenueLine = buildPath(revenuePoints);
+  const engagementArea = `M 0 ${chartHeight} L ${engagementPoints
+    .map(([x, y]) => `${x} ${y}`)
+    .join(" L ")} L ${chartWidth} ${chartHeight} Z`;
+  const revenueArea = `M 0 ${chartHeight} L ${revenuePoints
+    .map(([x, y]) => `${x} ${y}`)
+    .join(" L ")} L ${chartWidth} ${chartHeight} Z`;
+
+  const formatMillions = (value) => `${value.toFixed(2)}M`;
+
+  const defaultEngagement = 4.2;
+  const defaultChange = 18.4;
+  const activeEngagement = activeIndex !== null ? engagementData[activeIndex] : defaultEngagement;
+  const activeChange =
+    activeIndex !== null && activeIndex > 0
+      ? ((engagementData[activeIndex] - engagementData[activeIndex - 1]) / engagementData[activeIndex - 1]) * 100
+      : defaultChange;
+  const changeText = `${activeChange >= 0 ? "+" : "-"}${Math.abs(activeChange).toFixed(1)}%`;
+
+  const handleChartMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const point = "touches" in event ? event.touches[0] : event;
+    if (!point) return;
+    const x = Math.min(Math.max(point.clientX - rect.left, 0), rect.width);
+    const y = Math.min(Math.max(point.clientY - rect.top, 0), rect.height);
+    const index = Math.round((x / rect.width) * (engagementData.length - 1));
+    const pointerY = (y / rect.height) * chartHeight;
+    const engagementY = engagementPoints[index][1];
+    const distance = Math.abs(pointerY - engagementY);
+
+    if (distance <= 14) {
+      setActiveIndex(index);
+    } else {
+      setActiveIndex(null);
+    }
+  };
 
   return (
     <div className="animate-fadeUp">
@@ -37,7 +111,6 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
             </div>
             <div className="flex flex-col items-center px-2 text-[10px] font-bold text-[rgba(239,68,68,0.85)]">
               <div className="text-base text-[rgba(239,68,68,0.8)]">→</div>
-              <div>↓61.6%</div>
             </div>
             <button
               className={`flex-1 rounded-[14px] border-2 border-[rgba(139,92,246,0.6)] bg-[rgba(139,92,246,0.05)] p-5 text-center transition ${funnelFlashClass(
@@ -52,7 +125,6 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
             </button>
             <div className="flex flex-col items-center px-2 text-[10px] font-bold text-[rgba(239,68,68,0.85)]">
               <div className="text-base text-[rgba(239,68,68,0.8)]">→</div>
-              <div>↓61.5%</div>
             </div>
             <button
               className={`flex-1 rounded-[14px] border-2 border-[rgba(245,158,11,0.6)] bg-[rgba(245,158,11,0.05)] p-5 text-center transition ${funnelFlashClass(
@@ -67,7 +139,6 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
             </button>
             <div className="flex flex-col items-center px-2 text-[10px] font-bold text-[rgba(239,68,68,0.85)]">
               <div className="text-base text-[rgba(239,68,68,0.8)]">→</div>
-              <div>↓66.5%</div>
             </div>
             <div className="flex-1 rounded-[14px] border-2 border-[rgba(16,185,129,0.6)] bg-[rgba(16,185,129,0.05)] p-5 text-center">
               <div className="font-mono text-[28px] font-bold leading-none text-[#34D399]">6.2K</div>
@@ -75,7 +146,6 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
             </div>
             <div className="flex flex-col items-center px-2 text-[10px] font-bold text-[rgba(239,68,68,0.85)]">
               <div className="text-base text-[rgba(239,68,68,0.8)]">→</div>
-              <div>↓28.2%</div>
             </div>
             <button
               className={`flex-1 rounded-[14px] border-2 border-[rgba(59,130,246,0.6)] bg-[rgba(59,130,246,0.05)] p-5 text-center transition ${funnelFlashClass(
@@ -168,16 +238,29 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
           <div className="px-5 pb-5 pt-4">
             <div className="mb-3 flex gap-5">
               <div>
-                <div className="font-mono text-[22px] font-bold">4.2M</div>
+                <div className="font-mono text-[22px] font-bold">{formatMillions(activeEngagement)}</div>
                 <div className="text-[11px] text-[var(--text-muted)]">Total Interactions</div>
               </div>
               <div>
-                <div className="font-mono text-[22px] font-bold text-[var(--green)]">+18.4%</div>
+                <div
+                  className={`font-mono text-[22px] font-bold ${
+                    activeChange >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"
+                  }`}
+                >
+                  {changeText}
+                </div>
                 <div className="text-[11px] text-[var(--text-muted)]">vs prev. period</div>
               </div>
             </div>
-            <div className="relative h-40">
-              <svg className="h-full w-full" viewBox="0 0 580 150" preserveAspectRatio="none">
+            <div
+              className="relative h-40"
+              onMouseMove={handleChartMove}
+              onMouseLeave={() => setActiveIndex(null)}
+              onTouchStart={handleChartMove}
+              onTouchMove={handleChartMove}
+              onClick={handleChartMove}
+            >
+              <svg className="h-full w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="engGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#6366F1" stopOpacity="0.3" />
@@ -188,35 +271,78 @@ export default function OverviewPage({ notifs, badgeCount, onTrigger, onDismiss,
                     <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                <line x1="0" y1="30" x2="580" y2="30" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                <line x1="0" y1="75" x2="580" y2="75" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                <line x1="0" y1="120" x2="580" y2="120" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                <line x1="0" y1="30" x2={chartWidth} y2="30" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                <line x1="0" y1="75" x2={chartWidth} y2="75" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                <line x1="0" y1="120" x2={chartWidth} y2="120" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                <path d={engagementArea} fill="url(#engGrad)" />
+                <path d={engagementLine} fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" />
+                <path d={revenueArea} fill="url(#revGrad)" />
                 <path
-                  d="M0,120 C20,115 40,100 60,95 C80,90 100,85 120,75 C140,65 160,70 180,60 C200,50 220,55 240,45 C260,35 280,40 300,30 C320,25 340,32 360,28 C380,24 400,30 420,25 C440,20 460,28 480,22 C500,18 520,25 540,20 C560,16 570,18 580,15 L580,150 L0,150 Z"
-                  fill="url(#engGrad)"
-                />
-                <path
-                  d="M0,120 C20,115 40,100 60,95 C80,90 100,85 120,75 C140,65 160,70 180,60 C200,50 220,55 240,45 C260,35 280,40 300,30 C320,25 340,32 360,28 C380,24 400,30 420,25 C440,20 460,28 480,22 C500,18 520,25 540,20 C560,16 570,18 580,15"
-                  fill="none"
-                  stroke="#6366F1"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M0,135 C20,130 40,125 60,120 C80,115 100,118 120,110 C140,102 160,108 180,98 C200,88 220,92 240,85 C260,78 280,82 300,74 C320,68 340,72 360,66 C380,60 400,65 420,58 C440,52 460,58 480,52 C500,46 520,50 540,44 C560,38 570,40 580,36 L580,150 L0,150 Z"
-                  fill="url(#revGrad)"
-                />
-                <path
-                  d="M0,135 C20,130 40,125 60,120 C80,115 100,118 120,110 C140,102 160,108 180,98 C200,88 220,92 240,85 C260,78 280,82 300,74 C320,68 340,72 360,66 C380,60 400,65 420,58 C440,52 460,58 480,52 C500,46 520,50 540,44 C560,38 570,40 580,36"
+                  d={revenueLine}
                   fill="none"
                   stroke="#10B981"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeDasharray="4 3"
                 />
-                <circle cx="300" cy="30" r="5" fill="#6366F1" opacity="0.8" />
-                <circle cx="300" cy="30" r="10" fill="rgba(99,102,241,0.15)" />
+                {activeIndex !== null && (
+                  <g>
+                    <line
+                      x1={engagementPoints[activeIndex][0]}
+                      y1="0"
+                      x2={engagementPoints[activeIndex][0]}
+                      y2={chartHeight}
+                      stroke="rgba(148,163,184,0.35)"
+                      strokeWidth="1"
+                    />
+                    <circle
+                      cx={engagementPoints[activeIndex][0]}
+                      cy={engagementPoints[activeIndex][1]}
+                      r="6"
+                      fill="rgba(99,102,241,0.2)"
+                    />
+                    <circle
+                      cx={engagementPoints[activeIndex][0]}
+                      cy={engagementPoints[activeIndex][1]}
+                      r="3.5"
+                      fill="#6366F1"
+                    />
+                    <circle
+                      cx={revenuePoints[activeIndex][0]}
+                      cy={revenuePoints[activeIndex][1]}
+                      r="3.5"
+                      fill="#10B981"
+                    />
+                  </g>
+                )}
               </svg>
+              {activeIndex !== null && (
+                <div
+                  className="pointer-events-none absolute top-2"
+                  style={{ left: `${(engagementPoints[activeIndex][0] / chartWidth) * 100}%` }}
+                >
+                  <div className="-translate-x-1/2 rounded-lg border border-white/10 bg-[var(--surface)] px-3 py-2 text-[11px] shadow-lg">
+                    <div className="mb-1 text-[10px] uppercase tracking-[0.5px] text-[var(--text-muted)]">
+                      {chartLabels[activeIndex]}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-[var(--primary)]" />
+                      <span className="text-[var(--text-muted)]">Total Interactions</span>
+                      <span className="ml-auto font-mono text-[var(--text)]">
+                        {formatMillions(engagementData[activeIndex])}
+                      </span>
+                    </div>
+                    <div className="ml-4 text-[10px] text-[var(--text-muted)]">{changeText} vs prev. period</div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-[var(--green)]" />
+                      <span className="text-[var(--text-muted)]">Revenue</span>
+                      <span className="ml-auto font-mono text-[var(--text)]">
+                        {formatMillions(revenueData[activeIndex])}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="mt-2 flex gap-4 text-[11px] text-[var(--text-muted)]">
               <div className="flex items-center gap-1.5">

@@ -1,6 +1,21 @@
 "use client";
 
 export default function RevenuePage() {
+  const mrrSeries = [55, 62, 70, 78, 82, 86, 90, 100];
+  const mrrMonths = ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+  const chartWidth = 520;
+  const chartHeight = 120;
+  const maxValue = Math.max(...mrrSeries);
+  const linePoints = mrrSeries.map((value, index) => {
+    const x = (chartWidth / (mrrSeries.length - 1)) * index;
+    const y = chartHeight - (value / maxValue) * (chartHeight - 12) - 6;
+    return [x, y];
+  });
+  const linePath = `M ${linePoints.map(([x, y]) => `${x} ${y}`).join(" L ")}`;
+  const areaPath = `M 0 ${chartHeight} L ${linePoints
+    .map(([x, y]) => `${x} ${y}`)
+    .join(" L ")} L ${chartWidth} ${chartHeight} Z`;
+
   return (
     <div className="animate-fadeUp">
       <div className="mb-4 flex items-center gap-3 text-[16px] font-semibold">
@@ -42,31 +57,50 @@ export default function RevenuePage() {
                 <div className="text-[11px] text-[var(--text-muted)]">vs last month</div>
               </div>
             </div>
-            <div className="flex h-[100px] items-end gap-2">
-              {[55, 62, 70, 78, 82, 86, 90, 100].map((height, idx) => (
-                <div key={height} className="flex-1 text-center">
-                  <div
-                    className={`mx-auto w-full rounded-t-md ${
-                      idx === 7
-                        ? "bg-gradient-to-b from-[#F59E0B] to-[rgba(245,158,11,0.6)] shadow-[0_0_12px_rgba(245,158,11,0.3)]"
-                        : "bg-[rgba(245,158,11,0.4)]"
-                    }`}
-                    style={{ height: `${height}%` }}
+            <div className="space-y-2">
+              <svg className="h-[140px] w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="mrrFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(245,158,11,0.3)" />
+                    <stop offset="100%" stopColor="rgba(245,158,11,0)" />
+                  </linearGradient>
+                </defs>
+                {[30, 60, 90].map((y) => (
+                  <line
+                    key={y}
+                    x1="0"
+                    y1={y}
+                    x2={chartWidth}
+                    y2={y}
+                    stroke="rgba(148,163,184,0.18)"
+                    strokeWidth="1"
                   />
-                  <div className={`mt-1 text-[9px] ${idx === 7 ? "text-[var(--gold)] font-bold" : "text-[var(--text-dim)]"}`}>
-                    {[
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                      "Jan",
-                      "Feb",
-                      "Mar"
-                    ][idx]}
-                  </div>
-                </div>
-              ))}
+                ))}
+                <path d={areaPath} fill="url(#mrrFill)" />
+                <path
+                  d={linePath}
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <circle
+                  cx={linePoints[linePoints.length - 1][0]}
+                  cy={linePoints[linePoints.length - 1][1]}
+                  r="4.5"
+                  fill="#F59E0B"
+                />
+              </svg>
+              <div className="flex justify-between text-[9px]">
+                {mrrMonths.map((month, idx) => (
+                  <span
+                    key={month}
+                    className={idx === mrrMonths.length - 1 ? "font-semibold text-[var(--gold)]" : "text-[var(--text-dim)]"}
+                  >
+                    {month}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

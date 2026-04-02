@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "NexusTrade Admin - Command Center",
-  description: "NexusTrade admin dashboard"
+  title: "Trading socialhub Admin - Command Center",
+  description: "Trading socialhub admin dashboard"
 };
 
 export default function RootLayout({ children }) {

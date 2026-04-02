@@ -18,7 +18,7 @@ export default function Sidebar({ activePage, onChange }) {
             N
           </div>
           <div>
-            <div className="text-[15px] font-bold tracking-[-0.3px]">NexusTrade</div>
+            <div className="text-[15px] font-bold tracking-[-0.3px]">Trading socialhub</div>
             <div className="text-[10px] uppercase tracking-[1.5px] text-[var(--text-muted)]">
               Admin Console
             </div>

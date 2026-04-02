@@ -6,6 +6,91 @@ const filters = ["All-Time", "Monthly", "Weekly", "Daily"];
 
 export default function LeaderboardPage() {
   const [activeFilter, setActiveFilter] = useState("All-Time");
+  const [roleFilter, setRoleFilter] = useState("All Roles");
+
+  const rows = [
+    {
+      rank: 1,
+      medal: "bg-[rgba(245,158,11,0.2)] text-[#F59E0B]",
+      user: "CryptoKing",
+      email: "crypto@nexustrade.io",
+      role: "Trader",
+      roi: "+412%",
+      engagement: "98.4",
+      refs: "1,204",
+      badge: "⭐ Elite",
+      badgeClass: "bg-[rgba(245,158,11,0.1)] text-[var(--gold)]",
+      avatar: "CK",
+      gradient: "from-[#F59E0B] to-[#F97316]",
+      path: "M0,20 C10,18 20,12 30,8 C40,4 50,6 60,2"
+    },
+    {
+      rank: 2,
+      medal: "bg-[rgba(156,163,175,0.2)] text-[#9CA3AF]",
+      user: "BitMaster_Pro",
+      email: "bitmaster@nexustrade.io",
+      role: "Trader",
+      roi: "+284%",
+      engagement: "94.1",
+      refs: "892",
+      badge: "💎 Pro",
+      badgeClass: "bg-[rgba(99,102,241,0.1)] text-[var(--primary)]",
+      avatar: "BM",
+      gradient: "from-[#9CA3AF] to-[#6B7280]",
+      path: "M0,16 C10,14 20,10 30,12 C40,14 50,8 60,6"
+    },
+    {
+      rank: 3,
+      medal: "bg-[rgba(180,120,60,0.2)] text-[#CD7F32]",
+      user: "AlphaFox",
+      email: "alpha@nexustrade.io",
+      role: "Trader",
+      roi: "+219%",
+      engagement: "88.7",
+      refs: "441",
+      badge: "🔥 Rising",
+      badgeClass: "bg-[rgba(16,185,129,0.1)] text-[var(--green)]",
+      avatar: "AF",
+      gradient: "from-[#CD7F32] to-[#92400E]",
+      path: "M0,18 C10,16 20,14 30,10 C40,6 50,8 60,4"
+    },
+    {
+      rank: 4,
+      medal: "bg-white/5 text-[var(--text-muted)]",
+      user: "DeepWave",
+      email: "deepwave@nexustrade.io",
+      role: "Partner",
+      roi: "+187%",
+      engagement: "82.3",
+      refs: "1,820",
+      badge: "🌟 Expert",
+      badgeClass: "bg-[rgba(139,92,246,0.1)] text-[var(--accent)]",
+      avatar: "DW",
+      gradient: "from-[#3B82F6] to-[#6366F1]",
+      path: "M0,14 C10,16 20,12 30,14 C40,16 50,10 60,12"
+    },
+    {
+      rank: 5,
+      medal: "bg-white/5 text-[var(--text-muted)]",
+      user: "NanoQuant",
+      email: "nano@nexustrade.io",
+      role: "Trader",
+      roi: "+162%",
+      engagement: "79.8",
+      refs: "328",
+      badge: "🔥 Rising",
+      badgeClass: "bg-[rgba(16,185,129,0.1)] text-[var(--green)]",
+      avatar: "NQ",
+      gradient: "from-[#EC4899] to-[#8B5CF6]",
+      path: "M0,20 C10,15 20,18 30,12 C40,6 50,10 60,8"
+    }
+  ];
+
+  const filteredRows = rows.filter((row) => {
+    if (roleFilter === "All Roles") return true;
+    const normalized = roleFilter.toLowerCase().replace(/s$/, "");
+    return row.role.toLowerCase() === normalized;
+  });
 
   return (
     <div className="animate-fadeUp">
@@ -92,7 +177,11 @@ export default function LeaderboardPage() {
           ))}
         </div>
         <div className="flex gap-2">
-          <select className="rounded-lg border border-[var(--border)] bg-[var(--surface2)] px-3 py-1 text-[12px] text-[var(--text)] outline-none">
+          <select
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface2)] px-3 py-1 text-[12px] text-[var(--text)] outline-none"
+            value={roleFilter}
+            onChange={(event) => setRoleFilter(event.target.value)}
+          >
             <option>All Roles</option>
             <option>Traders</option>
             <option>Partners</option>
@@ -131,83 +220,7 @@ export default function LeaderboardPage() {
               </tr>
             </thead>
             <tbody className="text-[13px]">
-              {[
-                {
-                  rank: 1,
-                  medal: "bg-[rgba(245,158,11,0.2)] text-[#F59E0B]",
-                  user: "CryptoKing",
-                  email: "crypto@nexustrade.io",
-                  role: "Trader",
-                  roi: "+412%",
-                  engagement: "98.4",
-                  refs: "1,204",
-                  badge: "⭐ Elite",
-                  badgeClass: "bg-[rgba(245,158,11,0.1)] text-[var(--gold)]",
-                  avatar: "CK",
-                  gradient: "from-[#F59E0B] to-[#F97316]",
-                  path: "M0,20 C10,18 20,12 30,8 C40,4 50,6 60,2"
-                },
-                {
-                  rank: 2,
-                  medal: "bg-[rgba(156,163,175,0.2)] text-[#9CA3AF]",
-                  user: "BitMaster_Pro",
-                  email: "bitmaster@nexustrade.io",
-                  role: "Trader",
-                  roi: "+284%",
-                  engagement: "94.1",
-                  refs: "892",
-                  badge: "💎 Pro",
-                  badgeClass: "bg-[rgba(99,102,241,0.1)] text-[var(--primary)]",
-                  avatar: "BM",
-                  gradient: "from-[#9CA3AF] to-[#6B7280]",
-                  path: "M0,16 C10,14 20,10 30,12 C40,14 50,8 60,6"
-                },
-                {
-                  rank: 3,
-                  medal: "bg-[rgba(180,120,60,0.2)] text-[#CD7F32]",
-                  user: "AlphaFox",
-                  email: "alpha@nexustrade.io",
-                  role: "Trader",
-                  roi: "+219%",
-                  engagement: "88.7",
-                  refs: "441",
-                  badge: "🔥 Rising",
-                  badgeClass: "bg-[rgba(16,185,129,0.1)] text-[var(--green)]",
-                  avatar: "AF",
-                  gradient: "from-[#CD7F32] to-[#92400E]",
-                  path: "M0,18 C10,16 20,14 30,10 C40,6 50,8 60,4"
-                },
-                {
-                  rank: 4,
-                  medal: "bg-white/5 text-[var(--text-muted)]",
-                  user: "DeepWave",
-                  email: "deepwave@nexustrade.io",
-                  role: "Partner",
-                  roi: "+187%",
-                  engagement: "82.3",
-                  refs: "1,820",
-                  badge: "🌟 Expert",
-                  badgeClass: "bg-[rgba(139,92,246,0.1)] text-[var(--accent)]",
-                  avatar: "DW",
-                  gradient: "from-[#3B82F6] to-[#6366F1]",
-                  path: "M0,14 C10,16 20,12 30,14 C40,16 50,10 60,12"
-                },
-                {
-                  rank: 5,
-                  medal: "bg-white/5 text-[var(--text-muted)]",
-                  user: "NanoQuant",
-                  email: "nano@nexustrade.io",
-                  role: "Trader",
-                  roi: "+162%",
-                  engagement: "79.8",
-                  refs: "328",
-                  badge: "🔥 Rising",
-                  badgeClass: "bg-[rgba(16,185,129,0.1)] text-[var(--green)]",
-                  avatar: "NQ",
-                  gradient: "from-[#EC4899] to-[#8B5CF6]",
-                  path: "M0,20 C10,15 20,18 30,12 C40,6 50,10 60,8"
-                }
-              ].map((row) => (
+              {filteredRows.map((row) => (
                 <tr key={row.user} className="border-b border-[var(--border)] last:border-b-0">
                   <td className="px-3 py-3">
                     <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${row.medal}`}>
@@ -256,6 +269,11 @@ export default function LeaderboardPage() {
               ))}
             </tbody>
           </table>
+          {filteredRows.length === 0 && (
+            <div className="border-t border-[var(--border)] px-4 py-6 text-center text-[12px] text-[var(--text-muted)]">
+              No users found for this role.
+            </div>
+          )}
         </div>
       </div>
     </div>
