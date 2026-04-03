@@ -1,15 +1,27 @@
 "use client";
 
 const navItems = [
-  { id: "overview", label: "Dashboard", icon: "⬡" },
-  { id: "users", label: "User Management", icon: "👥", badge: "3" },
-  { id: "analytics", label: "Analytics", icon: "📈" },
-  { id: "leaderboard", label: "Leaderboard", icon: "🏆" },
-  { id: "referrals", label: "Referrals & Growth", icon: "🔗" },
-  { id: "revenue", label: "Revenue & Fees", icon: "💰" }
+  { id: "overview",    label: "Dashboard",         icon: "⬡" },
+  { id: "users",       label: "User Management",   icon: "👥", badgeKey: "kyc" },
+  { id: "analytics",   label: "Analytics",         icon: "📈" },
+  { id: "leaderboard", label: "Leaderboard",       icon: "🏆" },
+  { id: "referrals",   label: "Referrals & Growth", icon: "🔗" },
 ];
 
-export default function Sidebar({ activePage, onChange }) {
+export default function Sidebar({
+  activePage,
+  onChange,
+  kycPendingBadge,   // number | null — from usersStats API
+  notifCount,        // number — live notification count
+  adminName,
+  adminEmail,
+  adminInitials,
+}) {
+  const badgeFor = (item) => {
+    if (item.badgeKey === "kyc" && kycPendingBadge) return String(kycPendingBadge);
+    return null;
+  };
+
   return (
     <aside className="fixed left-0 top-0 z-[100] flex min-h-screen w-[var(--sidebar-w)] flex-col border-r border-[var(--border)] bg-[var(--surface)]">
       <div className="border-b border-[var(--border)] px-5 pb-4 pt-5">
@@ -30,8 +42,9 @@ export default function Sidebar({ activePage, onChange }) {
         <div className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[1.2px] text-[var(--text-dim)]">
           Main
         </div>
-        {navItems.slice(0, 5).map((item) => {
+        {navItems.map((item) => {
           const isActive = activePage === item.id;
+          const badge = badgeFor(item);
           return (
             <button
               key={item.id}
@@ -47,9 +60,9 @@ export default function Sidebar({ activePage, onChange }) {
               )}
               <span className="w-[18px] text-center text-[15px]">{item.icon}</span>
               <span>{item.label}</span>
-              {item.badge && (
+              {badge && (
                 <span className="ml-auto rounded-full bg-[var(--red)] px-1.5 text-[10px] font-semibold text-white">
-                  {item.badge}
+                  {badge}
                 </span>
               )}
             </button>
@@ -68,7 +81,7 @@ export default function Sidebar({ activePage, onChange }) {
           onClick={() => onChange("revenue")}
         >
           <span className="w-[18px] text-center text-[15px]">💰</span>
-          <span>Revenue & Fees</span>
+          <span>Revenue &amp; Fees</span>
         </button>
 
         <div className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[1.2px] text-[var(--text-dim)]">
@@ -77,9 +90,11 @@ export default function Sidebar({ activePage, onChange }) {
         <div className="mb-0.5 flex items-center gap-2 rounded-[10px] px-3 py-2 text-[13px] font-medium text-[var(--text-muted)]">
           <span className="w-[18px] text-center text-[15px]">🔔</span>
           <span>Notifications</span>
-          <span className="ml-auto rounded-full bg-[var(--gold)] px-1.5 text-[10px] font-semibold text-white">
-            5
-          </span>
+          {notifCount > 0 && (
+            <span className="ml-auto rounded-full bg-[var(--gold)] px-1.5 text-[10px] font-semibold text-white">
+              {notifCount}
+            </span>
+          )}
         </div>
         <div className="mb-0.5 flex items-center gap-2 rounded-[10px] px-3 py-2 text-[13px] font-medium text-[var(--text-muted)]">
           <span className="w-[18px] text-center text-[15px]">⚙️</span>
@@ -90,11 +105,11 @@ export default function Sidebar({ activePage, onChange }) {
       <div className="border-t border-[var(--border)] p-3.5">
         <div className="flex items-center gap-2.5 rounded-[10px] border border-[var(--border)] bg-white/5 p-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-xs font-bold">
-            SA
+            {adminInitials || "SA"}
           </div>
-          <div>
-            <div className="text-[12px] font-semibold">Super Admin</div>
-            <div className="text-[10px] text-[var(--text-muted)]">admin@nexustrade.io</div>
+          <div className="min-w-0">
+            <div className="truncate text-[12px] font-semibold">{adminName || "Super Admin"}</div>
+            <div className="truncate text-[10px] text-[var(--text-muted)]">{adminEmail || "—"}</div>
           </div>
         </div>
       </div>

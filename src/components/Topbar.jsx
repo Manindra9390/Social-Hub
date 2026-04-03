@@ -1,6 +1,6 @@
 "use client";
 
-export default function Topbar({ title, bellPulse, theme, onToggleTheme }) {
+export default function Topbar({ title, bellPulse, notifCount, adminInitials, theme, onToggleTheme }) {
   return (
     <header className="sticky top-0 z-[90] flex h-[60px] items-center gap-4 border-b border-[var(--border)] bg-[color:var(--bg)]/80 px-6 backdrop-blur-[20px]">
       <div className="text-[16px] font-semibold">{title}</div>
@@ -26,7 +26,10 @@ export default function Topbar({ title, bellPulse, theme, onToggleTheme }) {
           }`}
         >
           🔔
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border-2 border-[var(--bg)] bg-[var(--red)] animate-pulseSoft" />
+          {/* Red dot only shown when there are live notifications */}
+          {notifCount > 0 && (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border-2 border-[var(--bg)] bg-[var(--red)] animate-pulseSoft" />
+          )}
         </button>
         <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[18px] text-[var(--text-muted)] transition hover:border-[var(--border-bright)] hover:text-[var(--text)]">
           ⚙️
@@ -40,7 +43,7 @@ export default function Topbar({ title, bellPulse, theme, onToggleTheme }) {
           <span className="hidden sm:inline">{theme === "light" ? "Light" : "Dark"}</span>
         </button>
         <div className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-[rgba(99,102,241,0.4)] bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-xs font-bold">
-          SA
+          {adminInitials || "SA"}
         </div>
       </div>
     </header>
